@@ -2,7 +2,53 @@ use std::fs::File;
 use std::io::{Read, BufReader};
 use std::thread::sleep;
 use std::time::Duration;
+use serde_json;
+use crate::app::DefaultLogLevel;
 
+pub fn parse_strings_json(parsed_strings: &mut Vec<String>) -> Vec<serde_json::Value> {
+    let mut json_values : Vec<serde_json::Value> = Vec::new();
+    for json_str in parsed_strings {
+        match serde_json::from_str(json_str) {
+            Ok(json_val) => {
+                json_values.push(json_val)
+            }
+            Err(_) => {}
+        }
+    }
+    json_values
+}
+
+pub fn match_log_level(json_val : &mut serde_json::Value, log_level:DefaultLogLevel) -> bool {
+    let debug_category = json_val["level"].as_str();
+    let mut log_debug_category = None;
+    match debug_category {
+        Some(val) => {
+            if val == "Debug" {
+                log_debug_category = Some(DefaultLogLevel::DEBUG);
+            }
+            else if val == "Info" {
+                log_debug_category = Some(DefaultLogLevel::INFO);
+            }
+            else if val == "Warning" {
+                log_debug_category = Some(DefaultLogLevel::WARNING);
+                
+            }
+            else if val == "Error" {
+                log_debug_category = Some(DefaultLogLevel::WARNING);
+            } 
+            else {}
+        }
+        None => {}
+    }
+    match log_debug_category {
+        Some(val) => {
+            val == log_level
+        }
+        None => {
+            true
+        }
+    }
+}
 
 
 pub fn read_contents_from_file(reader: &mut BufReader<File>, temp_buffer: &mut Vec<u8>) -> Vec<String> {
@@ -21,8 +67,6 @@ pub fn read_contents_from_file(reader: &mut BufReader<File>, temp_buffer: &mut V
                 
             }
             Ok(bytes_read) => {
-                // Process the chunk of data
-                // 'buffer' contains 'bytes_read' valid bytes
                 Some(String::from_utf8_lossy(&buffer[0..bytes_read]).into_owned());
                 for i in 0..bytes_read {
                     if buffer[i] == b'\n' {

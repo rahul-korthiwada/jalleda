@@ -8,6 +8,7 @@ use ratatui::{
 };
 
 use crate::app::{App, CurrentScreen};
+use crate::file::{match_log_level};
 
 // ANCHOR: method_sig
 pub fn ui(f: &mut Frame, app: &App) {
@@ -41,11 +42,27 @@ pub fn ui(f: &mut Frame, app: &App) {
     let mut list_items = Vec::<ListItem>::new();
     
     // TODO :- Don't use clone here
-    for val in app.logs.clone() {
-        list_items.push(ListItem::new(Line::from(Span::styled(
-            format!("{:?}",val),
-            Style::default().fg(Color::Yellow),
-        ))));
+    
+    match app.current_screen {
+        CurrentScreen::Main => {
+            for val in app.logs.clone() {
+                list_items.push(ListItem::new(Line::from(Span::styled(
+                    format!("{}",val),
+                    Style::default().fg(Color::Yellow),
+                ))));
+            }
+        }
+        CurrentScreen::DefaultFiltering(log_level) => {
+            for mut val in app.logs.clone() {
+                if(match_log_level(&mut val,log_level)) {
+                    list_items.push(ListItem::new(Line::from(Span::styled(
+                        format!("{}",val),
+                        Style::default().fg(Color::Yellow),
+                    ))));
+                }
+                
+            }
+        }
     }
 
     let list = List::new(list_items);
@@ -102,7 +119,7 @@ pub fn ui(f: &mut Frame, app: &App) {
                 "D to Debug Mode, I to Info Mode, W to Warning Mode, E to Error Mode, (q) to quit",
                 Style::default().fg(Color::Red),
             ),
-            CurrentScreen::DefaultFiltering => Span::styled(
+            CurrentScreen::DefaultFiltering (_)=> Span::styled(
                 "(ESC) to cancel/(q) to quit",
                 Style::default().fg(Color::Red),
             ),

@@ -23,9 +23,9 @@ mod app;
 mod ui;
 mod file;
 use crate::{
-    app::{App, CurrentScreen},
+    app::{App, CurrentScreen, DefaultLogLevel},
     ui::ui,
-    file:: read_contents_from_file
+    file:: {read_contents_from_file, parse_strings_json}
 };
 
 // ANCHOR: main_all
@@ -85,8 +85,8 @@ fn run_app<B: Backend>(
     let mut temp_buffer: Vec<u8> = Vec::new();
     loop {
         terminal.draw(|f| ui(f, app))?;
-        let content = read_contents_from_file(reader, &mut temp_buffer);
-        app.logs.extend(content);
+        let mut content = read_contents_from_file(reader, &mut temp_buffer);
+        app.logs.extend(parse_strings_json(&mut content));
         // ANCHOR_END: ui_loop
 
         // ANCHOR: event_poll
@@ -99,23 +99,23 @@ fn run_app<B: Backend>(
             match app.current_screen {
                 CurrentScreen::Main => match key.code {
                     KeyCode::Char('D') => {
-                        app.current_screen = CurrentScreen::DefaultFiltering;
+                        app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::DEBUG);
                     }
                     KeyCode::Char('I') => {
-                        app.current_screen = CurrentScreen::DefaultFiltering;
+                        app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::INFO);
                     }
                     KeyCode::Char('W') => {
-                        app.current_screen = CurrentScreen::DefaultFiltering;
+                        app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::WARNING);
                     }
                     KeyCode::Char('E') => {
-                        app.current_screen = CurrentScreen::DefaultFiltering;
+                        app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::ERROR);
                     }
                     KeyCode::Char('q') => {
                         return Ok(true);
                     }
                     _ => {}
                 },
-                CurrentScreen::DefaultFiltering => match key.code {
+                CurrentScreen::DefaultFiltering(_) => match key.code {
                     KeyCode::Esc => {
                         app.current_screen = CurrentScreen::Main;
                     }
