@@ -82,15 +82,11 @@ fn run_app<B: Backend>(
 ) -> io::Result<bool> {
     // ANCHOR_END: run_method_signature
     // ANCHOR: ui_loop
+    let mut temp_buffer: Vec<u8> = Vec::new();
     loop {
         terminal.draw(|f| ui(f, app))?;
-        let content = read_contents_from_file(reader);
-        match content {
-            Some(val) => {
-                app.logs.push(val)
-            }
-            None => {}
-        }
+        let content = read_contents_from_file(reader, &mut temp_buffer);
+        app.logs.extend(content);
         // ANCHOR_END: ui_loop
 
         // ANCHOR: event_poll
