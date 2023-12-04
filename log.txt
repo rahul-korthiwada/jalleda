@@ -4,3 +4,5 @@
 {"level":"Error"}
 {"level":"Error"}
 {"level":"Debug"}
+{"level":"Debug"}
+{"level":"Error"}

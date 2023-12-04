@@ -34,7 +34,7 @@ pub fn match_log_level(json_val : &mut serde_json::Value, log_level:DefaultLogLe
                 
             }
             else if val == "Error" {
-                log_debug_category = Some(DefaultLogLevel::WARNING);
+                log_debug_category = Some(DefaultLogLevel::ERROR);
             } 
             else {}
         }
