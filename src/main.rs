@@ -91,115 +91,117 @@ fn run_app<B: Backend>(
 
         // ANCHOR: event_poll
         // ANCHOR: main_screen
-        if let Event::Key(key) = event::read()? {
-            if key.kind == event::KeyEventKind::Release {
-                // Skip events that are not KeyEventKind::Press
-                continue;
-            }
-            match app.current_screen {
-                CurrentScreen::Main => match key.code {
-                    KeyCode::Char('D') => {
-                        app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::DEBUG);
-                    }
-                    KeyCode::Char('I') => {
-                        app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::INFO);
-                    }
-                    KeyCode::Char('W') => {
-                        app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::WARNING);
-                    }
-                    KeyCode::Char('E') => {
-                        app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::ERROR);
-                    }
-                    KeyCode::Char('q') => {
-                        return Ok(true);
-                    }
-                    _ => {}
-                },
-                CurrentScreen::DefaultFiltering(_) => match key.code {
-                    KeyCode::Esc => {
-                        app.current_screen = CurrentScreen::Main;
-                    }
-                    KeyCode::Char('q') => {
-                        return Ok(true);
-                    }
-                    _ => {}
+        if crossterm::event::poll(std::time::Duration::from_millis(1))? {
+            if let Event::Key(key) = event::read()? {
+                if key.kind == event::KeyEventKind::Release {
+                    // Skip events that are not KeyEventKind::Press
+                    continue;
                 }
-                // ANCHOR_END: main_screen
-                // ANCHOR: exiting_screen
-            //     CurrentScreen::Exiting => match key.code {
-            //         KeyCode::Char('y') => {
-            //             return Ok(true);
-            //         }
-            //         KeyCode::Char('n') | KeyCode::Char('q') => {
-            //             return Ok(false);
-            //         }
-            //         _ => {}
-            //     },
-            //     // ANCHOR_END: exiting_screen
-            //     // ANCHOR: editing_enter
-            //     CurrentScreen::Editing if key.kind == KeyEventKind::Press => {
-            //         match key.code {
-            //             KeyCode::Enter => {
-            //                 if let Some(editing) = &app.currently_editing {
-            //                     match editing {
-            //                         CurrentlyEditing::Key => {
-            //                             app.currently_editing =
-            //                                 Some(CurrentlyEditing::Value);
-            //                         }
-            //                         CurrentlyEditing::Value => {
-            //                             app.save_key_value();
-            //                             app.current_screen =
-            //                                 CurrentScreen::Main;
-            //                         }
-            //                     }
-            //                 }
-            //             }
-            //             // ANCHOR_END: editing_enter
-            //             // ANCHOR: backspace_editing
-            //             KeyCode::Backspace => {
-            //                 if let Some(editing) = &app.currently_editing {
-            //                     match editing {
-            //                         CurrentlyEditing::Key => {
-            //                             app.key_input.pop();
-            //                         }
-            //                         CurrentlyEditing::Value => {
-            //                             app.value_input.pop();
-            //                         }
-            //                     }
-            //                 }
-            //             }
-            //             // ANCHOR_END: backspace_editing
-            //             // ANCHOR: escape_editing
-            //             KeyCode::Esc => {
-            //                 app.current_screen = CurrentScreen::Main;
-            //                 app.currently_editing = None;
-            //             }
-            //             // ANCHOR_END: escape_editing
-            //             // ANCHOR: tab_editing
-            //             KeyCode::Tab => {
-            //                 app.toggle_editing();
-            //             }
-            //             // ANCHOR_END: tab_editing
-            //             // ANCHOR: character_editing
-            //             KeyCode::Char(value) => {
-            //                 if let Some(editing) = &app.currently_editing {
-            //                     match editing {
-            //                         CurrentlyEditing::Key => {
-            //                             app.key_input.push(value);
-            //                         }
-            //                         CurrentlyEditing::Value => {
-            //                             app.value_input.push(value);
-            //                         }
-            //                     }
-            //                 }
-            //             }
-            //             // ANCHOR_END: character_editing
-            //             _ => {}
-            //         }
-            //     }
-            //     _ => {}
-            }
+                match app.current_screen {
+                    CurrentScreen::Main => match key.code {
+                        KeyCode::Char('D') => {
+                            app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::DEBUG);
+                        }
+                        KeyCode::Char('I') => {
+                            app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::INFO);
+                        }
+                        KeyCode::Char('W') => {
+                            app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::WARNING);
+                        }
+                        KeyCode::Char('E') => {
+                            app.current_screen = CurrentScreen::DefaultFiltering(DefaultLogLevel::ERROR);
+                        }
+                        KeyCode::Char('q') => {
+                            return Ok(true);
+                        }
+                        _ => {}
+                    },
+                    CurrentScreen::DefaultFiltering(_) => match key.code {
+                        KeyCode::Esc => {
+                            app.current_screen = CurrentScreen::Main;
+                        }
+                        KeyCode::Char('q') => {
+                            return Ok(true);
+                        }
+                        _ => {}
+                    }
+                    // ANCHOR_END: main_screen
+                    // ANCHOR: exiting_screen
+                //     CurrentScreen::Exiting => match key.code {
+                //         KeyCode::Char('y') => {
+                //             return Ok(true);
+                //         }
+                //         KeyCode::Char('n') | KeyCode::Char('q') => {
+                //             return Ok(false);
+                //         }
+                //         _ => {}
+                //     },
+                //     // ANCHOR_END: exiting_screen
+                //     // ANCHOR: editing_enter
+                //     CurrentScreen::Editing if key.kind == KeyEventKind::Press => {
+                //         match key.code {
+                //             KeyCode::Enter => {
+                //                 if let Some(editing) = &app.currently_editing {
+                //                     match editing {
+                //                         CurrentlyEditing::Key => {
+                //                             app.currently_editing =
+                //                                 Some(CurrentlyEditing::Value);
+                //                         }
+                //                         CurrentlyEditing::Value => {
+                //                             app.save_key_value();
+                //                             app.current_screen =
+                //                                 CurrentScreen::Main;
+                //                         }
+                //                     }
+                //                 }
+                //             }
+                //             // ANCHOR_END: editing_enter
+                //             // ANCHOR: backspace_editing
+                //             KeyCode::Backspace => {
+                //                 if let Some(editing) = &app.currently_editing {
+                //                     match editing {
+                //                         CurrentlyEditing::Key => {
+                //                             app.key_input.pop();
+                //                         }
+                //                         CurrentlyEditing::Value => {
+                //                             app.value_input.pop();
+                //                         }
+                //                     }
+                //                 }
+                //             }
+                //             // ANCHOR_END: backspace_editing
+                //             // ANCHOR: escape_editing
+                //             KeyCode::Esc => {
+                //                 app.current_screen = CurrentScreen::Main;
+                //                 app.currently_editing = None;
+                //             }
+                //             // ANCHOR_END: escape_editing
+                //             // ANCHOR: tab_editing
+                //             KeyCode::Tab => {
+                //                 app.toggle_editing();
+                //             }
+                //             // ANCHOR_END: tab_editing
+                //             // ANCHOR: character_editing
+                //             KeyCode::Char(value) => {
+                //                 if let Some(editing) = &app.currently_editing {
+                //                     match editing {
+                //                         CurrentlyEditing::Key => {
+                //                             app.key_input.push(value);
+                //                         }
+                //                         CurrentlyEditing::Value => {
+                //                             app.value_input.push(value);
+                //                         }
+                //                     }
+                //                 }
+                //             }
+                //             // ANCHOR_END: character_editing
+                //             _ => {}
+                //         }
+                //     }
+                //     _ => {}
+                }
         }
+    }
         // ANCHOR_END: event_poll
     }
 }
